@@ -49,14 +49,14 @@ namespace Amanotes.Data
             return Difficulty.Easy;
         }
 
-        public void GenerateNotes(object source, Difficulty difficulty, Action<float, List<NoteData>> OnProgress, Action<List<NoteData>> OnComplete, Action<string> OnError)
+        public MidiFile GenerateNotes(object source, Difficulty difficulty, Action<float, List<NoteData>> OnProgress, Action<List<NoteData>> OnComplete, Action<string> OnError)
         {
             byte[] byteArray = (byte[])source;
             if (byteArray == null || byteArray.Length <= 0)
             {
                 Debug.LogWarning((object)"Trying to parse note data from empty MIDI content, stopping progress...");
                 if (OnError == null)
-                    return;
+                    return null;
                 OnError("MIDI file is empty");
             }
             else
@@ -91,26 +91,26 @@ namespace Amanotes.Data
                     {
                         if (midiEvents[index].isChannelEvent())
                         {
-                            MidiEvent binaryContentEvent1 = midiEvents[index];
-                            byte parameter1 = binaryContentEvent1.parameter1;
-                            if (binaryContentEvent1.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_On)
+                            MidiEvent midiEvent = midiEvents[index];
+                            byte parameter1 = midiEvent.parameter1;
+                            if (midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_On)
                             {
                                 if (dictionary.ContainsKey(parameter1))
                                 {
-                                    dictionary[parameter1].Push(binaryContentEvent1);
+                                    dictionary[parameter1].Push(midiEvent);
                                 }
                                 else
                                 {
                                     Stack<MidiEvent> binaryContentEventStack = new Stack<MidiEvent>();
-                                    binaryContentEventStack.Push(binaryContentEvent1);
+                                    binaryContentEventStack.Push(midiEvent);
                                     dictionary.Add(parameter1, binaryContentEventStack);
                                 }
                             }
-                            else if (binaryContentEvent1.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_Off)
+                            else if (midiEvent.midiChannelEvent == MidiHelper.MidiChannelEvent.Note_Off)
                             {
                                 MidiEvent binaryContentEvent2 = dictionary[parameter1].Pop();
                                 float num2 = (float)binaryContentEvent2.deltaTimeFromStart * num1;
-                                float num3 = (float)(binaryContentEvent1.deltaTimeFromStart - binaryContentEvent2.deltaTimeFromStart);
+                                float num3 = (float)(midiEvent.deltaTimeFromStart - binaryContentEvent2.deltaTimeFromStart);
                                 float num4 = (double)num3 <= 86.0 ? 0.0f : num3 * num1;
                                 int num5 = (int)parameter1 % 12;
                                 if (ContentNoteGenerator.GetSuitableDifficulty(parameter1) == difficulty)
@@ -131,11 +131,16 @@ namespace Amanotes.Data
                     }
                     if (OnProgress != null)
                         OnProgress(1f, noteDataList);
-                    if (OnComplete == null)
-                        return;
-                    OnComplete(noteDataList);
+
+
+                    if (OnComplete != null)
+                        OnComplete(noteDataList);
+
+                    return MidiFile;
                 }
             }
+
+            return null;
         }
     }
 }

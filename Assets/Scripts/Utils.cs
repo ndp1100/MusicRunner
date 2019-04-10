@@ -35,4 +35,14 @@ public class Utils
         return numArray;
     }
 
+    public static byte[] LoadFileFromResources(string path)
+    {
+        byte[] numArray = (byte[])null;
+        TextAsset txtAsset = Resources.Load<TextAsset>(path);
+        if(txtAsset != null)
+            numArray = txtAsset.bytes;
+
+        return numArray;
+    }
+
 }

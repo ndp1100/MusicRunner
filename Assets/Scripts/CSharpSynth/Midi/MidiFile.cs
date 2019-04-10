@@ -91,6 +91,7 @@ namespace CSharpSynth.Midi
             }
             catch (Exception ex)
             {
+//                Debug.Log("Failed to load");
                 throw new Exception("Midi Failed to Load!", ex);
             }
             finally
@@ -130,7 +131,11 @@ namespace CSharpSynth.Midi
         public void CombineTracks()
         {
             if (tracks.Length < 2)
+            {
+                combinedTrack = tracks[0];
                 return;
+            }
+
             int total_eventCount = 0;
             UInt64 total_notesPlayed = 0;
             List<byte> programsUsed = new List<byte>();

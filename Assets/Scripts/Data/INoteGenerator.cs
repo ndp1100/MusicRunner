@@ -6,11 +6,12 @@
 
 using System;
 using System.Collections.Generic;
+using CSharpSynth.Midi;
 
 namespace Amanotes.Data
 {
-  public interface INoteGenerator
-  {
-    void GenerateNotes(object source, Difficulty difficult, Action<float, List<NoteData>> OnProgress, Action<List<NoteData>> OnComplete, Action<string> OnError);
-  }
+    public interface INoteGenerator
+    {
+        MidiFile GenerateNotes(object source, Difficulty difficult, Action<float, List<NoteData>> OnProgress, Action<List<NoteData>> OnComplete, Action<string> OnError);
+    }
 }

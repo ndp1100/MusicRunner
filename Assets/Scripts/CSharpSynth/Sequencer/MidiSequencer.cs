@@ -95,18 +95,18 @@ namespace CSharpSynth.Sequencer
                     //Convert delta time to sample time
                     eventIndex = 0;
                     uint lastSample = 0;
-                    for (int x = 0; x < _MidiFile.Tracks[0].MidiEvents.Length; x++)
+                    for (int x = 0; x < _MidiFile.CombinedTrack.MidiEvents.Length; x++)
                     {
-                        _MidiFile.Tracks[0].MidiEvents[x].deltaTime = lastSample + (uint)DeltaTimetoSamples(_MidiFile.Tracks[0].MidiEvents[x].deltaTime);
-                        lastSample = _MidiFile.Tracks[0].MidiEvents[x].deltaTime;
+                        _MidiFile.CombinedTrack.MidiEvents[x].deltaTime = lastSample + (uint)DeltaTimetoSamples(_MidiFile.CombinedTrack.MidiEvents[x].deltaTime);
+                        lastSample = _MidiFile.CombinedTrack.MidiEvents[x].deltaTime;
                         //Update tempo
-                        if (_MidiFile.Tracks[0].MidiEvents[x].midiMetaEvent == MidiHelper.MidiMetaEvent.Tempo)
+                        if (_MidiFile.CombinedTrack.MidiEvents[x].midiMetaEvent == MidiHelper.MidiMetaEvent.Tempo)
                         {
-                            _MidiFile.BeatsPerMinute = MidiHelper.MicroSecondsPerMinute / System.Convert.ToUInt32(_MidiFile.Tracks[0].MidiEvents[x].Parameters[0]);
+                            _MidiFile.BeatsPerMinute = MidiHelper.MicroSecondsPerMinute / System.Convert.ToUInt32(_MidiFile.CombinedTrack.MidiEvents[x].Parameters[0]);
                         }
                     }
                     //Set total time to proper value
-                    _MidiFile.Tracks[0].TotalTime = _MidiFile.Tracks[0].MidiEvents[_MidiFile.Tracks[0].MidiEvents.Length-1].deltaTime;
+                    _MidiFile.CombinedTrack.TotalTime = _MidiFile.CombinedTrack.MidiEvents[_MidiFile.CombinedTrack.MidiEvents.Length-1].deltaTime;
                     //reset tempo
                     _MidiFile.BeatsPerMinute = 120;
                     //mark midi as ready for sequencing
@@ -151,6 +151,7 @@ namespace CSharpSynth.Sequencer
             {
                 //UnitySynth
                 Debug.Log("Error Loading Midi:\n" + ex.Message);
+//                Debug.Log("Trace : " + ex.StackTrace);
                 return false;
             }
             return LoadMidi(mf, UnloadUnusedInstruments);
