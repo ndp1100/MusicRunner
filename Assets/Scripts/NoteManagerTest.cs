@@ -18,6 +18,7 @@ public class NoteManagerTest : MonoBehaviour
     public GameObject cubePrefab;
     public string bankFilePath = "FM Bank/fm";
     public GameObject Ball;
+    public AudioSource audioSource;
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +30,8 @@ public class NoteManagerTest : MonoBehaviour
 
     void LoadMidiFile()
     {
-        string fileName = "Paris.mid";
+//        string fileName = "Paris.mid";
+        string fileName = "Unity.bin";
 
         try
         {
@@ -71,6 +73,8 @@ public class NoteManagerTest : MonoBehaviour
         Play(midiFile);
     }
 
+    private bool seted = false;
+
     void GenerateNoteToTile()
     {
         if (this.noteCount > 0)
@@ -82,6 +86,11 @@ public class NoteManagerTest : MonoBehaviour
                 float positionZ = speed * noteData.timeAppear;
                 GameObject cube = Instantiate(cubePrefab) as GameObject;
                 cube.transform.position = new Vector3(0, 1, positionZ);
+                if (!seted)
+                {
+                    Ball.transform.position = cube.transform.position;
+                    seted = true;
+                }
             }
         }
     }
@@ -89,7 +98,7 @@ public class NoteManagerTest : MonoBehaviour
     void FilterNote()
     {
         float currentTime = 0.0f;
-        float minimumTimebetween2Note = 0.5f;
+        float minimumTimebetween2Note = 0.7f;
 
         for (int index = 0; index < this.noteCount; ++index)
         {
@@ -109,8 +118,12 @@ public class NoteManagerTest : MonoBehaviour
 
     void Update()
     {
+//        if(currentTimeClock > 0) audioSource.Play();
         currentTimeClock += Time.deltaTime;
-        Ball.transform.position += Vector3.forward * speed * Time.deltaTime;
+//        if (currentTimeClock >= 1.1)
+        {
+            Ball.transform.position += Vector3.forward * speed * Time.deltaTime;
+        }
     }
 
     public class Sound

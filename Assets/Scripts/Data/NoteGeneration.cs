@@ -17,7 +17,7 @@ namespace Amanotes.Data
         {
 
             ContentNoteGenerator contentNoteGenerator = new ContentNoteGenerator();
-            MidiFile midiFile = contentNoteGenerator.GenerateNotes(data/*(object) CryptoHelper.DeCryptContentFile(data)*/, difficulty, (Action<float, List<NoteData>>)((progress, notelist) => { }), (Action<List<NoteData>>)(noteList =>
+            MidiFile midiFile = contentNoteGenerator.GenerateNotes(/*data*/(object) CryptoHelper.DeCryptContentFile(data), difficulty, (Action<float, List<NoteData>>)((progress, notelist) => { }), (Action<List<NoteData>>)(noteList =>
             {
                 if (callbackNoteData == null)
                     return;
