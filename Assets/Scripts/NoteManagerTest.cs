@@ -15,6 +15,7 @@ public class NoteManagerTest : MonoBehaviour
     public int noteCount;
 
     public float speed = 1f;
+    public float MaxY = 2f;
     public GameObject cubePrefab;
     public string bankFilePath = "FM Bank/fm";
     public GameObject Ball;
@@ -30,14 +31,14 @@ public class NoteManagerTest : MonoBehaviour
 
     void LoadMidiFile()
     {
-//        string fileName = "Paris.mid";
+        //        string fileName = "Paris.mid";
         string fileName = "Unity.bin";
 
         try
         {
             string path = Application.dataPath + "/" + fileName;
             byte[] midiBytes = Utils.LoadFileBinary(path);
-//            byte[] midiBytes = Utils.LoadFileFromResources(fileName);
+            //            byte[] midiBytes = Utils.LoadFileFromResources(fileName);
 
 
             MidiFile midiFile = NoteGeneration.LoadFileContent(midiBytes, Difficulty.Easy, (Action<List<NoteData>>)(resSucess =>
@@ -75,6 +76,10 @@ public class NoteManagerTest : MonoBehaviour
 
     private bool seted = false;
 
+    private int currentIndex = 0;
+    private float nextAppearTime = 0;
+    private float durationTime = 0;
+
     void GenerateNoteToTile()
     {
         if (this.noteCount > 0)
@@ -90,6 +95,10 @@ public class NoteManagerTest : MonoBehaviour
                 {
                     Ball.transform.position = cube.transform.position;
                     seted = true;
+
+                    currentIndex = 0;
+                    nextAppearTime = noteData.timeAppear;
+                    durationTime = nextAppearTime;
                 }
             }
         }
@@ -118,12 +127,46 @@ public class NoteManagerTest : MonoBehaviour
 
     void Update()
     {
-//        if(currentTimeClock > 0) audioSource.Play();
         currentTimeClock += Time.deltaTime;
-//        if (currentTimeClock >= 1.1)
+        Ball.transform.position += Vector3.forward * speed * Time.deltaTime;
+
+        UpdateBallY();
+    }
+
+    private float currentDurationTime = 0;
+    private void UpdateBallY()
+    {
+        if (currentTimeClock >= nextAppearTime)
         {
-            Ball.transform.position += Vector3.forward * speed * Time.deltaTime;
+            currentIndex++;
+            
+            nextAppearTime = noteDatas[currentIndex].timeAppear;
+            durationTime = (noteDatas[currentIndex].timeAppear - currentTimeClock);
+            currentDurationTime = 0;
         }
+
+        currentDurationTime += Time.deltaTime;
+
+        Vector3 currentBallPosition = Ball.transform.position;
+        float ballY;
+        
+
+        if (currentDurationTime <= durationTime / 2f)
+        {
+            float ratio = currentDurationTime / (durationTime / 2f);
+            ratio = Mathf.Clamp01(ratio);
+            Debug.Log("Ratio : " + ratio);
+            ballY = Mathf.Lerp(0, MaxY, ratio);
+        }
+        else
+        {
+            float ratio = (nextAppearTime - currentDurationTime) / (durationTime / 2f);
+            ratio = Mathf.Clamp01(ratio);
+            Debug.Log("Ratio : " + ratio);
+            ballY = Mathf.Lerp(0, MaxY, ratio);
+        }
+
+        Ball.transform.position = new Vector3(currentBallPosition.x, ballY, currentBallPosition.z);
     }
 
     public class Sound

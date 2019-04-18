@@ -445,6 +445,7 @@ MonoBehaviour:
   noteDatas: []
   noteCount: 0
   speed: 10
+  MaxY: 5
   cubePrefab: {fileID: 1229893467}
   bankFilePath: FM Bank/fm
   Ball: {fileID: 327143052}
