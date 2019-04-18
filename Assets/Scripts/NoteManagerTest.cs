@@ -34,7 +34,7 @@ public class NoteManagerTest : MonoBehaviour
     void LoadMidiFile()
     {
         //        string fileName = "Paris.mid";
-        string fileName = "TrapHipHop.bin";
+        string fileName = "Unity.bin";
 
         try
         {
