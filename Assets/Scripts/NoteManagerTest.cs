@@ -21,6 +21,8 @@ public class NoteManagerTest : MonoBehaviour
     public GameObject Ball;
     public AudioSource audioSource;
 
+    public MoveFollowParabol ballMoveParabol;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -32,7 +34,7 @@ public class NoteManagerTest : MonoBehaviour
     void LoadMidiFile()
     {
         //        string fileName = "Paris.mid";
-        string fileName = "Unity.bin";
+        string fileName = "TrapHipHop.bin";
 
         try
         {
@@ -80,6 +82,8 @@ public class NoteManagerTest : MonoBehaviour
     private float nextAppearTime = 0;
     private float durationTime = 0;
 
+    private List<Vector3> notePos = new List<Vector3>();
+
     void GenerateNoteToTile()
     {
         if (this.noteCount > 0)
@@ -91,14 +95,19 @@ public class NoteManagerTest : MonoBehaviour
                 float positionZ = speed * noteData.timeAppear;
                 GameObject cube = Instantiate(cubePrefab) as GameObject;
                 cube.transform.position = new Vector3(0, 1, positionZ);
+                notePos.Add(cube.transform.position);
+
                 if (!seted)
                 {
-                    Ball.transform.position = cube.transform.position;
+//                    Ball.transform.position = cube.transform.position;
+                    Ball.transform.position = Vector3.zero;
                     seted = true;
 
                     currentIndex = 0;
                     nextAppearTime = noteData.timeAppear;
                     durationTime = nextAppearTime;
+
+                    ballMoveParabol.SetData(durationTime, MaxY, Vector3.zero, cube.transform.position);
                 }
             }
         }
@@ -127,8 +136,8 @@ public class NoteManagerTest : MonoBehaviour
 
     void Update()
     {
-        currentTimeClock += Time.deltaTime;
-        Ball.transform.position += Vector3.forward * speed * Time.deltaTime;
+        
+//        Ball.transform.position += Vector3.forward * speed * Time.deltaTime;
 
         UpdateBallY();
     }
@@ -136,6 +145,8 @@ public class NoteManagerTest : MonoBehaviour
     private float currentDurationTime = 0;
     private void UpdateBallY()
     {
+        currentTimeClock += Time.deltaTime;
+
         if (currentTimeClock >= nextAppearTime)
         {
             currentIndex++;
@@ -143,30 +154,36 @@ public class NoteManagerTest : MonoBehaviour
             nextAppearTime = noteDatas[currentIndex].timeAppear;
             durationTime = (noteDatas[currentIndex].timeAppear - currentTimeClock);
             currentDurationTime = 0;
+
+            ballMoveParabol.SetData(durationTime, MaxY, Ball.transform.position, notePos[currentIndex]);
         }
 
         currentDurationTime += Time.deltaTime;
 
-        Vector3 currentBallPosition = Ball.transform.position;
-        float ballY;
-        
+        ballMoveParabol.Move();
 
-        if (currentDurationTime <= durationTime / 2f)
-        {
-            float ratio = currentDurationTime / (durationTime / 2f);
-            ratio = Mathf.Clamp01(ratio);
-            Debug.Log("Ratio : " + ratio);
-            ballY = Mathf.Lerp(0, MaxY, ratio);
-        }
-        else
-        {
-            float ratio = (nextAppearTime - currentDurationTime) / (durationTime / 2f);
-            ratio = Mathf.Clamp01(ratio);
-            Debug.Log("Ratio : " + ratio);
-            ballY = Mathf.Lerp(0, MaxY, ratio);
-        }
+        Ball.transform.position = new Vector3(0, Ball.transform.position.y, Ball.transform.position.z);
 
-        Ball.transform.position = new Vector3(currentBallPosition.x, ballY, currentBallPosition.z);
+//        Vector3 currentBallPosition = Ball.transform.position;
+//        float ballY;
+//        
+//
+//        if (currentDurationTime <= durationTime / 2f)
+//        {
+//            float ratio = currentDurationTime / (durationTime / 2f);
+//            ratio = Mathf.Clamp01(ratio);
+//            Debug.Log("Ratio : " + ratio);
+//            ballY = Mathf.Lerp(0, MaxY, ratio);
+//        }
+//        else
+//        {
+//            float ratio = (nextAppearTime - currentDurationTime) / (durationTime / 2f);
+//            ratio = Mathf.Clamp01(ratio);
+//            Debug.Log("Ratio : " + ratio);
+//            ballY = Mathf.Lerp(0, MaxY, ratio);
+//        }
+//
+//        Ball.transform.position = new Vector3(currentBallPosition.x, ballY, currentBallPosition.z);
     }
 
     public class Sound
