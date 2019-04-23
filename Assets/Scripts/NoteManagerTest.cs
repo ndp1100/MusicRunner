@@ -9,6 +9,9 @@ using UnityEngine;
 
 public class NoteManagerTest : MonoBehaviour
 {
+    public static NoteManagerTest instance;
+
+
     [HideInInspector]
     public List<NoteData> noteDatas;
     [HideInInspector]
@@ -23,9 +26,13 @@ public class NoteManagerTest : MonoBehaviour
 
     public MoveFollowParabol ballMoveParabol;
 
+    public GeneratePlatformManager generatePlatformManager;
+
     // Start is called before the first frame update
     void Start()
     {
+        instance = this;
+
         Ball.transform.position = new Vector3(0, 1, 0);
 
         LoadMidiFile();
@@ -90,33 +97,71 @@ public class NoteManagerTest : MonoBehaviour
         {
             FilterNote();
 
-            foreach (NoteData noteData in noteDatas)
+            Ball.transform.position = Vector3.zero;
+
+            var actionsList = generatePlatformManager.GenerateActionData(noteDatas);
+            Vector3 currentDirection = Vector3.forward;
+            Vector3 currentPos = Vector3.zero;
+            float lastAppertime = 0;
+
+            for (int i = 0; i < noteDatas.Count; i++)
             {
-                float positionZ = speed * noteData.timeAppear;
-                GameObject cube = Instantiate(cubePrefab) as GameObject;
-                cube.transform.position = new Vector3(0, 1, positionZ);
-                notePos.Add(cube.transform.position);
+                var noteData = noteDatas[i];
+
+                Vector3 nextPos = currentPos + currentDirection * speed * (noteData.timeAppear - lastAppertime);
+                lastAppertime = noteData.timeAppear;
+                currentPos = nextPos;
+
+                if (i < noteDatas.Count)
+                {
+                    var nextAction = actionsList[i];
+                    switch (nextAction.actionEventType)
+                    {
+                        case ActionEventType.TURNLEFT:
+                            currentDirection = Vector3.left;
+                            break;
+                        case ActionEventType.TURNRIGHT:
+                            currentDirection = Vector3.right;
+                            break;
+//                        case ActionEventType.JUMPUP:
+//                            currentDirection = Vector3.up;
+//                            break;
+//                        case ActionEventType.JUMPOVER:
+//                            currentDirection = Vector3.forward;
+//                            break;
+//                        case ActionEventType.FALLDOWN:
+//                            currentDirection = Vector3.down;
+//                            break;
+                    }
+                }
+
+                InstantiateCube(nextPos);
 
                 if (!seted)
                 {
-//                    Ball.transform.position = cube.transform.position;
-                    Ball.transform.position = Vector3.zero;
                     seted = true;
 
                     currentIndex = 0;
                     nextAppearTime = noteData.timeAppear;
                     durationTime = nextAppearTime;
 
-                    ballMoveParabol.SetData(durationTime, MaxY, Vector3.zero, cube.transform.position);
+                    ballMoveParabol.SetData(durationTime, MaxY, Vector3.zero, nextPos);
                 }
             }
         }
     }
 
+    public void InstantiateCube(Vector3 position)
+    {
+        GameObject cube = Instantiate(cubePrefab) as GameObject;
+        cube.transform.position = position;
+        notePos.Add(position);
+    }
+
     void FilterNote()
     {
         float currentTime = 0.0f;
-        float minimumTimebetween2Note = 0.7f;
+        float minimumTimebetween2Note = 0.5f;
 
         for (int index = 0; index < this.noteCount; ++index)
         {
@@ -164,26 +209,7 @@ public class NoteManagerTest : MonoBehaviour
 
         Ball.transform.position = new Vector3(0, Ball.transform.position.y, Ball.transform.position.z);
 
-//        Vector3 currentBallPosition = Ball.transform.position;
-//        float ballY;
-//        
-//
-//        if (currentDurationTime <= durationTime / 2f)
-//        {
-//            float ratio = currentDurationTime / (durationTime / 2f);
-//            ratio = Mathf.Clamp01(ratio);
-//            Debug.Log("Ratio : " + ratio);
-//            ballY = Mathf.Lerp(0, MaxY, ratio);
-//        }
-//        else
-//        {
-//            float ratio = (nextAppearTime - currentDurationTime) / (durationTime / 2f);
-//            ratio = Mathf.Clamp01(ratio);
-//            Debug.Log("Ratio : " + ratio);
-//            ballY = Mathf.Lerp(0, MaxY, ratio);
-//        }
-//
-//        Ball.transform.position = new Vector3(currentBallPosition.x, ballY, currentBallPosition.z);
+
     }
 
     public class Sound

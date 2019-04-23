@@ -438,6 +438,7 @@ GameObject:
   - component: {fileID: 851544305}
   - component: {fileID: 851544307}
   - component: {fileID: 851544308}
+  - component: {fileID: 851544309}
   m_Layer: 0
   m_Name: NoteManagerTest
   m_TagString: Untagged
@@ -466,6 +467,7 @@ MonoBehaviour:
   Ball: {fileID: 1190810555}
   audioSource: {fileID: 851544308}
   ballMoveParabol: {fileID: 1190810556}
+  generatePlatformManager: {fileID: 851544309}
 --- !u!4 &851544306
 Transform:
   m_ObjectHideFlags: 0
@@ -584,6 +586,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &851544309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 851544304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 214819712d999614bb2ee67e7e49a266, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
