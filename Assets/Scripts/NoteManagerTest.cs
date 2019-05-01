@@ -114,25 +114,9 @@ public class NoteManagerTest : MonoBehaviour
 
                 if (i < noteDatas.Count)
                 {
-                    var nextAction = actionsList[i];
-                    switch (nextAction.actionEventType)
-                    {
-                        case ActionEventType.TURNLEFT:
-                            currentDirection = Vector3.left;
-                            break;
-                        case ActionEventType.TURNRIGHT:
-                            currentDirection = Vector3.right;
-                            break;
-//                        case ActionEventType.JUMPUP:
-//                            currentDirection = Vector3.up;
-//                            break;
-//                        case ActionEventType.JUMPOVER:
-//                            currentDirection = Vector3.forward;
-//                            break;
-//                        case ActionEventType.FALLDOWN:
-//                            currentDirection = Vector3.down;
-//                            break;
-                    }
+                    ActionEvent nextAction = actionsList[i];
+
+                    currentDirection = GetDirection(currentDirection, nextAction.actionEventType);
                 }
 
                 InstantiateCube(nextPos);
@@ -150,6 +134,28 @@ public class NoteManagerTest : MonoBehaviour
             }
         }
     }
+
+    public Vector3 GetDirection(Vector3 currentDirection, ActionEventType actionEvent)
+    {
+        Vector3 direction = Vector3.forward;
+
+        Quaternion quaternion = Quaternion.identity;
+        if (actionEvent == ActionEventType.TURNLEFT)
+        {
+            quaternion = Quaternion.Euler(0, -90, 0);
+        }
+        else if(actionEvent == ActionEventType.TURNRIGHT)
+        {
+            quaternion = Quaternion.Euler(0, 90, 0);
+        }else if (actionEvent == ActionEventType.FORWARD_JUMPUP)
+        {
+            return currentDirection;
+        }
+
+        direction = quaternion * currentDirection;
+        return direction;
+    }
+
 
     public void InstantiateCube(Vector3 position)
     {
@@ -181,21 +187,19 @@ public class NoteManagerTest : MonoBehaviour
 
     void Update()
     {
-        
-//        Ball.transform.position += Vector3.forward * speed * Time.deltaTime;
-
-        UpdateBallY();
+        UpdateBallPosition();
     }
 
     private float currentDurationTime = 0;
-    private void UpdateBallY()
+    private void UpdateBallPosition()
     {
         currentTimeClock += Time.deltaTime;
 
         if (currentTimeClock >= nextAppearTime)
         {
             currentIndex++;
-            
+            if (currentIndex >= noteDatas.Count) return;
+
             nextAppearTime = noteDatas[currentIndex].timeAppear;
             durationTime = (noteDatas[currentIndex].timeAppear - currentTimeClock);
             currentDurationTime = 0;
@@ -206,9 +210,6 @@ public class NoteManagerTest : MonoBehaviour
         currentDurationTime += Time.deltaTime;
 
         ballMoveParabol.Move();
-
-        Ball.transform.position = new Vector3(0, Ball.transform.position.y, Ball.transform.position.z);
-
 
     }
 

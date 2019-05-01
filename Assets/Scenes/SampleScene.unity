@@ -598,6 +598,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 214819712d999614bb2ee67e7e49a266, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  randomActionRate: 190000003200000064000000
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0

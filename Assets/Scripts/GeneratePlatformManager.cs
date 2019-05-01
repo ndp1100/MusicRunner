@@ -10,7 +10,7 @@ public enum ActionEventType
 {
     TURNLEFT,
     TURNRIGHT,
-//    JUMPUP,
+    FORWARD_JUMPUP,
 //    JUMPOVER,
 //    FALLDOWN
 }
@@ -20,6 +20,7 @@ public class GeneratePlatformManager : MonoBehaviour
 {
     private List<ActionEvent> actions;
 
+    public List<int> randomActionRate = new List<int>(){25, 50, 100};
 
     // Start is called before the first frame update
     void Start()
@@ -32,17 +33,17 @@ public class GeneratePlatformManager : MonoBehaviour
         actions = new List<ActionEvent>();
         Random random = new Random(DateTime.Now.Millisecond);
 
-        ActionEventType lastEvent = ActionEventType.TURNLEFT;
+        ActionEventType lastTurnEvent = ActionEventType.FORWARD_JUMPUP;
         for (int i = 0; i < noteDatas.Count; i++)
         {
             ActionEvent action = new ActionEvent();
 
-            if (lastEvent == ActionEventType.TURNLEFT || lastEvent == ActionEventType.TURNRIGHT)
+            if (lastTurnEvent == ActionEventType.TURNLEFT || lastTurnEvent == ActionEventType.TURNRIGHT)
             {
                 while (true)
                 {
                     ActionEventType randomEvent = GetRandomActionEvent(random);
-                    if (randomEvent != lastEvent)
+                    if (randomEvent != lastTurnEvent)
                     {
                         action.actionEventType = randomEvent;
                         break;
@@ -56,16 +57,32 @@ public class GeneratePlatformManager : MonoBehaviour
 
             action.index = i;
             actions.Add(action);
-            lastEvent = action.actionEventType;
+
+            if(action.actionEventType == ActionEventType.TURNLEFT || action.actionEventType == ActionEventType.TURNRIGHT)
+                lastTurnEvent = action.actionEventType;
         }
 
         return actions;
     }
 
+    //TODO : optimize this algorithm, should add exceptType list, only random in that list
     private ActionEventType GetRandomActionEvent(Random random)
     {
+        ActionEventType randomActionEvent = ActionEventType.FORWARD_JUMPUP;
+
         Array values = Enum.GetValues(typeof(ActionEventType));
-        ActionEventType randomActionEvent = (ActionEventType)values.GetValue(random.Next(values.Length));
+
+        int randomValue = random.Next(0, 100);
+        for (int i = 0; i < randomActionRate.Count; i++)
+        {
+            if (randomValue <= randomActionRate[i])
+            {
+                randomActionEvent = (ActionEventType)values.GetValue(i);
+                break;
+            }
+        }
+
+//        ActionEventType randomActionEvent = (ActionEventType)values.GetValue(random.Next(values.Length));
         return randomActionEvent;
     }
 
