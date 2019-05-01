@@ -31,6 +31,8 @@ public class MoveFollowParabol : MonoBehaviour
 
         startPos = sPos;
         EndPos = ePos;
+
+        transform.LookAt(EndPos, Vector3.up);
     }
 
 
@@ -47,7 +49,9 @@ public class MoveFollowParabol : MonoBehaviour
         if (hasData)
         {
             currentTime += Time.deltaTime;
-            transform.position = MathParabola.Parabola(startPos, EndPos, maxHeight, currentTime / duration);
+//            transform.position = MathParabola.Parabola(startPos, EndPos, maxHeight, currentTime / duration);
+
+            transform.position = MathParabola.Line(startPos, EndPos, currentTime / duration);
         }
     }
 }

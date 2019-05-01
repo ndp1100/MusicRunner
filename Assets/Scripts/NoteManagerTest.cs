@@ -17,9 +17,12 @@ public class NoteManagerTest : MonoBehaviour
     [HideInInspector]
     public int noteCount;
 
+    public bool Auto = true;
+    public float accuracyTime = 0.5f;
     public float speed = 1f;
     public float MaxY = 2f;
     public GameObject cubePrefab;
+    public GameObject cubeJumpOverPrefab;
     public string bankFilePath = "FM Bank/fm";
     public GameObject Ball;
     public AudioSource audioSource;
@@ -117,9 +120,9 @@ public class NoteManagerTest : MonoBehaviour
                     ActionEvent nextAction = actionsList[i];
 
                     currentDirection = GetDirection(currentDirection, nextAction.actionEventType);
-                }
 
-                InstantiateCube(nextPos);
+                    InstantiateCube(nextPos, nextAction.actionEventType);
+                }
 
                 if (!seted)
                 {
@@ -144,10 +147,11 @@ public class NoteManagerTest : MonoBehaviour
         {
             quaternion = Quaternion.Euler(0, -90, 0);
         }
-        else if(actionEvent == ActionEventType.TURNRIGHT)
+        else if (actionEvent == ActionEventType.TURNRIGHT)
         {
             quaternion = Quaternion.Euler(0, 90, 0);
-        }else if (actionEvent == ActionEventType.FORWARD_JUMPUP)
+        }
+        else if (actionEvent == ActionEventType.FORWARD_JUMPOVER)
         {
             return currentDirection;
         }
@@ -157,9 +161,14 @@ public class NoteManagerTest : MonoBehaviour
     }
 
 
-    public void InstantiateCube(Vector3 position)
+    public void InstantiateCube(Vector3 position, ActionEventType actionEventType)
     {
-        GameObject cube = Instantiate(cubePrefab) as GameObject;
+        GameObject cube;
+        if (actionEventType == ActionEventType.FORWARD_JUMPOVER)
+            cube = Instantiate(cubeJumpOverPrefab) as GameObject;
+        else
+            cube = Instantiate(cubePrefab) as GameObject;
+
         cube.transform.position = position;
         notePos.Add(position);
     }
@@ -167,7 +176,7 @@ public class NoteManagerTest : MonoBehaviour
     void FilterNote()
     {
         float currentTime = 0.0f;
-        float minimumTimebetween2Note = 0.5f;
+        float minimumTimebetween2Note = 0.95f;
 
         for (int index = 0; index < this.noteCount; ++index)
         {
@@ -187,30 +196,49 @@ public class NoteManagerTest : MonoBehaviour
 
     void Update()
     {
-        UpdateBallPosition();
-    }
-
-    private float currentDurationTime = 0;
-    private void UpdateBallPosition()
-    {
         currentTimeClock += Time.deltaTime;
 
-        if (currentTimeClock >= nextAppearTime)
+        if (!Auto)
         {
-            currentIndex++;
-            if (currentIndex >= noteDatas.Count) return;
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                if (nextAppearTime - accuracyTime <= currentTimeClock &&
+                    currentTimeClock <= nextAppearTime + accuracyTime)
+                {
+                    currentIndex++;
+                    if (currentIndex >= noteDatas.Count) return;
 
-            nextAppearTime = noteDatas[currentIndex].timeAppear;
-            durationTime = (noteDatas[currentIndex].timeAppear - currentTimeClock);
-            currentDurationTime = 0;
+                    nextAppearTime = noteDatas[currentIndex].timeAppear;
+                    durationTime = (noteDatas[currentIndex].timeAppear - currentTimeClock);
 
-            ballMoveParabol.SetData(durationTime, MaxY, Ball.transform.position, notePos[currentIndex]);
+                    ballMoveParabol.SetData(durationTime, MaxY, Ball.transform.position, notePos[currentIndex]);
+                }
+                else
+                {
+                    Debug.LogError("Failed");
+                }
+            }
+
+            if (currentTimeClock > nextAppearTime + accuracyTime)
+            {
+                Debug.LogError("Failed");
+            }
+        }
+        else
+        {
+            if (currentTimeClock >= nextAppearTime)
+            {
+                currentIndex++;
+                if (currentIndex >= noteDatas.Count) return;
+
+                nextAppearTime = noteDatas[currentIndex].timeAppear;
+                durationTime = (noteDatas[currentIndex].timeAppear - currentTimeClock);
+
+                ballMoveParabol.SetData(durationTime, MaxY, Ball.transform.position, notePos[currentIndex]);
+            }
         }
 
-        currentDurationTime += Time.deltaTime;
-
         ballMoveParabol.Move();
-
     }
 
     public class Sound

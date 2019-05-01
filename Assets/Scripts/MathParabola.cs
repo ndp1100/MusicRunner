@@ -22,4 +22,10 @@ public class MathParabola
         return new Vector2(mid.x, f(t) + Mathf.Lerp(start.y, end.y, t));
     }
 
+    public static Vector3 Line(Vector3 start, Vector3 end, float t)
+    {
+        var mid = Vector3.Lerp(start, end, t);
+        return mid;
+    }
+
 }

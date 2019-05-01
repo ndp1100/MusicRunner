@@ -10,7 +10,7 @@ public enum ActionEventType
 {
     TURNLEFT,
     TURNRIGHT,
-    FORWARD_JUMPUP,
+    FORWARD_JUMPOVER,
 //    JUMPOVER,
 //    FALLDOWN
 }
@@ -33,7 +33,7 @@ public class GeneratePlatformManager : MonoBehaviour
         actions = new List<ActionEvent>();
         Random random = new Random(DateTime.Now.Millisecond);
 
-        ActionEventType lastTurnEvent = ActionEventType.FORWARD_JUMPUP;
+        ActionEventType lastTurnEvent = ActionEventType.FORWARD_JUMPOVER;
         for (int i = 0; i < noteDatas.Count; i++)
         {
             ActionEvent action = new ActionEvent();
@@ -68,7 +68,7 @@ public class GeneratePlatformManager : MonoBehaviour
     //TODO : optimize this algorithm, should add exceptType list, only random in that list
     private ActionEventType GetRandomActionEvent(Random random)
     {
-        ActionEventType randomActionEvent = ActionEventType.FORWARD_JUMPUP;
+        ActionEventType randomActionEvent = ActionEventType.FORWARD_JUMPOVER;
 
         Array values = Enum.GetValues(typeof(ActionEventType));
 
