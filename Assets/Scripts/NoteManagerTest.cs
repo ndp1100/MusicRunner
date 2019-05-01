@@ -23,6 +23,7 @@ public class NoteManagerTest : MonoBehaviour
     public float MaxY = 2f;
     public GameObject cubePrefab;
     public GameObject cubeJumpOverPrefab;
+    public GameObject cubeBlockRoadPrefab;
     public string bankFilePath = "FM Bank/fm";
     public GameObject Ball;
     public AudioSource audioSource;
@@ -113,7 +114,6 @@ public class NoteManagerTest : MonoBehaviour
 
                 Vector3 nextPos = currentPos + currentDirection * speed * (noteData.timeAppear - lastAppertime);
                 lastAppertime = noteData.timeAppear;
-                currentPos = nextPos;
 
                 if (i < noteDatas.Count)
                 {
@@ -122,7 +122,11 @@ public class NoteManagerTest : MonoBehaviour
                     currentDirection = GetDirection(currentDirection, nextAction.actionEventType);
 
                     InstantiateCube(nextPos, nextAction.actionEventType);
+
+                    GenerateRoad(currentPos, nextPos, nextAction.actionEventType);
                 }
+
+                currentPos = nextPos;
 
                 if (!seted)
                 {
@@ -136,6 +140,26 @@ public class NoteManagerTest : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void GenerateRoad(Vector3 currentPos, Vector3 nextPost, ActionEventType nextActionEventType)
+    {
+        //size of block is (1,1,1)
+        float size = 1f;
+
+        float dist = Vector3.Distance(currentPos, nextPost);
+        int numberOfBlock = Mathf.RoundToInt(dist);
+        Vector3 direction = (nextPost - currentPos).normalized;
+        Vector3 pos = currentPos + direction * 0.5f * size;
+        pos.y = -1 * size * 0.5f;
+
+        for (int i = 0; i < numberOfBlock; i++)
+        {
+            GameObject roadBlockUnit = Instantiate(cubeBlockRoadPrefab);
+            roadBlockUnit.transform.position = pos;
+            pos = pos + direction * size;
+        }
+        
     }
 
     public Vector3 GetDirection(Vector3 currentDirection, ActionEventType actionEvent)
