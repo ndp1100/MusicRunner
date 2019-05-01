@@ -121,9 +121,11 @@ public class NoteManagerTest : MonoBehaviour
 
                     currentDirection = GetDirection(currentDirection, nextAction.actionEventType);
 
-                    InstantiateCube(nextPos, nextAction.actionEventType);
+                    InstantiateCube(nextPos, currentDirection, nextAction.actionEventType);
 
                     GenerateRoad(currentPos, nextPos, nextAction.actionEventType);
+
+                    notePos.Add(nextPos);
                 }
 
                 currentPos = nextPos;
@@ -184,17 +186,35 @@ public class NoteManagerTest : MonoBehaviour
         return direction;
     }
 
-
-    public void InstantiateCube(Vector3 position, ActionEventType actionEventType)
+    public void InstatiateObstackJumpOver(Vector3 position, Vector3 currectDirection)
     {
-        GameObject cube;
+        position.y = 1;
+        GameObject obstack = Instantiate(cubeJumpOverPrefab);
+        obstack.transform.position = position + currectDirection * 1f;
+
+        obstack.transform.rotation = Quaternion.FromToRotation(obstack.transform.forward, currectDirection);
+
+//        float dotV = Vector3.Dot(obstack.transform.forward, currectDirection);
+//        if (dotV < 1)
+//        {
+//            obstack.transform.rotation = Quaternion.FromToRotation(obstack.transform.forward, currectDirection);
+//        }
+    }
+
+    public void InstantiateCube(Vector3 position, Vector3 currectDirection, ActionEventType actionEventType)
+    {
+        /*GameObject cube;
         if (actionEventType == ActionEventType.FORWARD_JUMPOVER)
             cube = Instantiate(cubeJumpOverPrefab) as GameObject;
         else
             cube = Instantiate(cubePrefab) as GameObject;
 
-        cube.transform.position = position;
-        notePos.Add(position);
+        cube.transform.position = position;*/
+
+        if (actionEventType == ActionEventType.FORWARD_JUMPOVER)
+        {
+            InstatiateObstackJumpOver(position, currectDirection);
+        }
     }
 
     void FilterNote()
